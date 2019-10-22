@@ -1,0 +1,24 @@
+{
+    "name": "vendor/philharmony",
+    "description": "Philharmony PHP Framework",
+    "keywords": [
+        "philharmony",
+        "framework"
+    ],
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Vyacheslav Veremeevsky",
+            "email": "ProSlavon86@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "PhilHarmony\\" : ""
+        }
+    }
+}
