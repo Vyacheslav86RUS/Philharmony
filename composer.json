@@ -15,7 +15,18 @@
         }
     ],
     "require": {},
-    "require-dev": {},
+    "require-dev": {
+        "codeception/codeception": "2.3.6",
+        "codeception/mockery-module": "*",
+        "codeception/specify": "*",
+        "codeception/verify": "*",
+        "flow/jsonpath": "@stable",
+        "phpmd/phpmd": "*",
+        "phpstan/phpstan": "*",
+        "phpunit/php-code-coverage": "~5.2.4",
+        "sebastian/phpcpd": "^3",
+        "squizlabs/php_codesniffer": "*"
+    },
     "autoload": {
         "psr-4": {
             "PhilHarmony\\" : ""
