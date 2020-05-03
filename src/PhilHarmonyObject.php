@@ -1,10 +1,10 @@
 <?php
 
-namespace PhilHarmony\Base;
+namespace PhilHarmony\src;
 
-
-class BaseApplicationObject
+class PhilHarmonyObject
 {
+
     public function __construct()
     {
     }
@@ -65,5 +65,24 @@ class BaseApplicationObject
         throw new \RuntimeException(
             'Unknow method: ' . get_called_class() . '::' . $name . '(' . implode(',', $arguments) . ')'
         );
+    }
+    public function __clone()
+    {
+        // TODO: Implement __clone() method.
+    }
+
+    public function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+    }
+
+    public function __invoke()
+    {
+        // TODO: Implement __invoke() method.
+    }
+
+    public function __toString()
+    {
+        return '';
     }
 }
