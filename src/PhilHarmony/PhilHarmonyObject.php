@@ -1,17 +1,12 @@
 <?php
 
-namespace PhilHarmony\src;
+namespace PhilHarmony;
 
 class PhilHarmonyObject
 {
-
-    public function __construct()
-    {
-    }
-
     public function __get($name)
     {
-        $getter = 'get' . $name;
+        $getter = 'get' . ucfirst($name);
 
         if (method_exists($this, $getter)) {
             return $this->$getter();
@@ -22,7 +17,7 @@ class PhilHarmonyObject
 
     public function __set($name, $value)
     {
-        $setter = 'set' . $name;
+        $setter = 'set' . ucfirst($name);
 
         if (!method_exists($this, $setter)) {
             throw new \RuntimeException('Setting unknown property: ' . get_class($this) . '::' . $name);
@@ -33,7 +28,7 @@ class PhilHarmonyObject
 
     public function __isset($name)
     {
-        $getter = 'get' . $name;
+        $getter = 'get' . ucfirst($name);
 
         if (method_exists($this, $getter)) {
             return $this->$getter() !== null;
@@ -44,7 +39,7 @@ class PhilHarmonyObject
 
     public function __unset($name)
     {
-        $setter = 'set' . $name;
+        $setter = 'set' . ucfirst($name);
 
         if (method_exists($this, $setter)) {
             $this->$setter(null);
