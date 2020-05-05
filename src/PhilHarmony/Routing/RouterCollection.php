@@ -1,6 +1,6 @@
 <?php
 
-namespace PhilHarmony\src\Routing;
+namespace PhilHarmony\Routing;
 
 use PhilHarmony\src\Exception\PhilHarmonyRouterCollectionException;
 

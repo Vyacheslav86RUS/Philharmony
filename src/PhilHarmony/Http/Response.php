@@ -1,6 +1,6 @@
 <?php
 
-namespace PhilHarmony\src\Http;
+namespace PhilHarmony\Http;
 
 class Response
 {
