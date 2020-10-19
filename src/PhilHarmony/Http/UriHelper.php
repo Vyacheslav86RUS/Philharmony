@@ -8,9 +8,9 @@ class UriHelper
 {
     /**
      * @param int|null $port
-     * @return int
+     * @return int|null
      */
-    public static function filterPort(?int $port): int
+    public static function filterPort(?int $port): ?int
     {
         if ($port === null) {
             return null;
