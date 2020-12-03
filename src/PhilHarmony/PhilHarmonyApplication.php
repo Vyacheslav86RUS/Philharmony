@@ -8,6 +8,7 @@ use PhilHarmony\Http\Uri;
 use PhilHarmony\Http\Url;
 use PhilHarmony\Routing\Route;
 use PhilHarmony\Routing\Router;
+use PhilHarmony\DependencyInjection\Container;
 use ReflectionObject;
 
 class PhilHarmonyApplication
@@ -32,26 +33,51 @@ class PhilHarmonyApplication
      */
     private $response;
 
+    /**
+     * @var Container
+     */
+    private static $container;
+
     public function __construct()
     {
-        $url = Url::createUrl();
-        $uri = new Uri($url);
-        $this->request = new Request($_SERVER['REQUEST_METHOD'], $uri);
-        $this->response = new Response();
-        $this->route = new Route($this->request, $this->response);
+        $this->initContainer();
+    }
+
+    public function initContainer(): void
+    {
+        self::$container = new Container();
+        self::$container->set(
+            Uri::class,
+            ['url' => Url::createUrl()]
+        );
+        self::$container->set(
+            Request::class,
+            [
+                'method' => $_SERVER['REQUEST_METHOD'],
+                'uri' => self::$container->get(Uri::class)
+            ]
+        );
+        self::$container->set(Response::class);
+        self::$container->set(
+            Route::class,
+            [
+                'request' => self::$container->get(Request::class),
+                'response' => self::$container->get(Response::class)
+            ]
+        );
     }
 
     public function run(): void
     {
-        $this->route->get('/h', function () {
+        $route = self::$container->get(Route::class);
+        $route->get('/h', function () {
             return 'Home page';
         });
-        $this->route->get('/a', ['class' => Router::class]);
-        $this->route->get('/t', 'Test page');
-        $this->route->get('/aa', [Response::class]);
-        //$this->route->post('/text', '');
+        $route->get('/a', ['class' => Router::class]);
+        $route->get('/t', 'Test page');
+        $route->get('/aa', [Response::class]);
 
-        echo $this->route->resolve();
+        echo $route->resolve();
 //        foreach ($_SERVER as $key => $value) {
 //            echo '[' . $key . ']' . ' => ' . $value . '<br>';
 //        }
@@ -99,15 +125,5 @@ class PhilHarmonyApplication
         }
 
         return $this->projectDir;
-    }
-
-    public function getRequest(): Request
-    {
-        return new Request();
-    }
-
-    public function getUri(string $url): Uri
-    {
-        return new Uri($url);
     }
 }
