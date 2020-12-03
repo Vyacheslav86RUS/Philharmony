@@ -5,14 +5,14 @@ namespace PhilHarmony\Routing;
 class Router
 {
     /**
-     * @var string
+     * @var Route[]
      */
     private $route;
 
     /**
-     * @return string
+     * @return Route[]
      */
-    public function getRoute(): string
+    public function getRoute(): array
     {
         return $this->route;
     }
@@ -22,7 +22,6 @@ class Router
      */
     public function setRoute(string $route): void
     {
-        $this->route = $route;
+        $this->route[] = $route;
     }
-
 }

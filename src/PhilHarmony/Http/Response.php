@@ -4,5 +4,4 @@ namespace PhilHarmony\Http;
 
 class Response
 {
-
 }

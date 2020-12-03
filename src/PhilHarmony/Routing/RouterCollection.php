@@ -2,8 +2,6 @@
 
 namespace PhilHarmony\Routing;
 
-use PhilHarmony\src\Exception\PhilHarmonyRouterCollectionException;
-
 class RouterCollection
 {
     /**
@@ -16,18 +14,15 @@ class RouterCollection
         return $this->routesCollection;
     }
 
-    public function getRouter(string $keyRoute): Router
+    /**
+     * @param string $method
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
+     */
+    public function setRouterCollection(string $method, string $url, $callable): self
     {
-        if (!isset($this->routesCollection[$keyRoute])) {
-            throw new PhilHarmonyRouterCollectionException();
-        }
-
-        return $this->routesCollection[$keyRoute];
-    }
-
-    public function setRouterCollection(string $keyRoute, Router $router): self
-    {
-        $this->routesCollection[$keyRoute] = $router;
+        $this->routesCollection[$method][$url] = $callable;
 
         return $this;
     }

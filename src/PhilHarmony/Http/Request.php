@@ -162,7 +162,12 @@ class Request implements ServerRequestInterface
      */
     public function getHeaderLine($name)
     {
-        // TODO: Implement getHeaderLine() method.
+        $value = $this->getHeader($name);
+        if (empty($value)) {
+            return '';
+        }
+
+        return implode(',', $value);
     }
 
     /**
@@ -182,7 +187,9 @@ class Request implements ServerRequestInterface
      */
     public function withHeader($name, $value)
     {
-        // TODO: Implement withHeader() method.
+        $this->_headers[$name] = $value;
+
+        return $this;
     }
 
     /**
@@ -203,7 +210,7 @@ class Request implements ServerRequestInterface
      */
     public function withAddedHeader($name, $value)
     {
-        // TODO: Implement withAddedHeader() method.
+        return $this;
     }
 
     /**
@@ -220,7 +227,7 @@ class Request implements ServerRequestInterface
      */
     public function withoutHeader($name)
     {
-        // TODO: Implement withoutHeader() method.
+        return $this;
     }
 
     /**

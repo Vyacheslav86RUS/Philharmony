@@ -2,70 +2,86 @@
 
 namespace PhilHarmony\Routing;
 
+use PhilHarmony\Http\HttpMethod;
 use PhilHarmony\PhilHarmonyObject;
 
-class BaseRoute extends PhilHarmonyObject
+abstract class BaseRoute extends PhilHarmonyObject
 {
     /**
-     * @var string
-     */
-    private $method;
-
-    /**
-     * @var string
-     */
-    private $url;
-
-    /**
-     * @var array
-     */
-    private $params;
-
-    /**
-     * @return string
-     */
-    public function getMethod(): string
-    {
-        return $this->method;
-    }
-
-    /**
      * @param string $method
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return mixed
      */
-    public function setMethod(string $method): void
-    {
-        $this->method = $method;
-    }
+    abstract public function addRoute(string $method, string $url, $callable);
 
     /**
-     * @return string
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
      */
-    public function getUrl(): string
+    public function get(string $url, $callable): self
     {
-        return $this->url;
+        return $this->addRoute(HttpMethod::GET, $url, $callable);
     }
 
     /**
      * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
      */
-    public function setUrl(string $url): void
+    public function post(string $url, $callable): self
     {
-        $this->url = $url;
+        return $this->addRoute(HttpMethod::POST, $url, $callable);
     }
 
     /**
-     * @return array
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
      */
-    public function getParams(): array
+    public function put(string $url, $callable): self
     {
-        return $this->params;
+        return $this->addRoute(HttpMethod::PUT, $url, $callable);
     }
 
     /**
-     * @param array $params
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
      */
-    public function setParams(array $params): void
+    public function patch(string $url, $callable): self
     {
-        $this->params = $params;
+        return $this->addRoute(HttpMethod::PATCH, $url, $callable);
+    }
+
+    /**
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
+     */
+    public function head(string $url, $callable): self
+    {
+        return $this->addRoute(HttpMethod::HEAD, $url, $callable);
+    }
+
+    /**
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
+     */
+    public function options(string $url, $callable = ''): self
+    {
+        return $this->addRoute(HttpMethod::OPTIONS, $url, $callable);
+    }
+
+    /**
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
+     */
+    public function delete(string $url, $callable = ''): self
+    {
+        return $this->addRoute(HttpMethod::DELETE, $url, $callable);
     }
 }

@@ -18,7 +18,6 @@ class Uri implements UriInterface
     public function __construct(string $url)
     {
         $parts = parse_url($url);
-
         if ($parts === false) {
             throw new PhilHarmonyInvalidArgumentException("Unable to parse URL: $url");
         }

@@ -2,57 +2,72 @@
 
 namespace PhilHarmony\Routing;
 
-/**
- * Class Route
- * @package PhilHarmony\Routing
- *
- * @property string $method
- * @property string $url
- * @property array $params
- */
+use PhilHarmony\Http\Request;
+use PhilHarmony\Http\Response;
+
 class Route extends BaseRoute
 {
-    public function addRoute(string $method, string $url, array $params = []): self
+    /**
+     * @var RouterCollection
+     */
+    private $routeCollection;
+
+    /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * @var Response
+     */
+    private $response;
+
+
+    public function __construct(Request $request, Response $response)
     {
-        $this->method = $method;
-        $this->url = $url;
-        $this->params = $params;
+        $this->request = $request;
+        $this->response = $response;
+        $this->routeCollection = new RouterCollection();
+    }
+
+    /**
+     * @param string $method
+     * @param string $url
+     * @param string|callable|array|null $callable
+     * @return $this
+     */
+    public function addRoute(string $method, string $url, $callable): self
+    {
+        $this->routeCollection->setRouterCollection($method, $url, $callable);
 
         return $this;
     }
 
-    public function get(string $url, array $params = []): self
+    public function resolve(): ?string
     {
-        return $this->addRoute('GET', $url, $params);
-    }
+        $collection = $this->routeCollection->getRouterCollection();
+        $callback = $collection[$this->request->getMethod()][$this->request->getUri()->getPath()] ?? null;
+        if (!$callback) {
+            echo 'callback is null';
+            return null;
+        }
 
-    public function post(string $url, array $params = []): self
-    {
-        return $this->addRoute('POST', $url, $params);
-    }
+        if (is_string($callback)) {
+            return $callback;
+        }
 
-    public function put(string $url, array $params = []): self
-    {
-        return $this->addRoute('PUT', $url, $params);
-    }
+        if (is_array($callback)) {
+            if (isset($callback['class'])) {
+                $class = new $callback['class'];
+                var_dump(get_class($class));
+            } else {
+                $class = new $callback[0];
+                var_dump(get_class($class));
+            }
+            return '';
+        }
 
-    public function head(string $url, array $params = []): self
-    {
-        return $this->addRoute('HEAD', $url, $params);
-    }
+        return call_user_func($callback, $this->request, $this->response);
 
-    public function options(string $url, array $params = []): self
-    {
-        return $this->addRoute('OPTIONS', $url, $params);
-    }
-
-    public function delete(string $url, array $params = []): self
-    {
-        return $this->addRoute('DELETE', $url, $params);
-    }
-
-    public function path(string $url, array $params = []): self
-    {
-        return $this->addRoute('PATH', $url, $params);
     }
 }
