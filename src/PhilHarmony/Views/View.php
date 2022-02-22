@@ -10,12 +10,17 @@ class View
     private $viewPath;
 
     /**
-     * @var ViewRender
+     * @var ViewRenderInterface
      */
     private $render;
 
+    public function __construct(ViewRenderInterface $render)
+    {
+        $this->render = $render;
+    }
+
     public function render(string $viewName, array $params = []): string
     {
-        return '';
+       return $this->render->render($viewName, $params);
     }
 }

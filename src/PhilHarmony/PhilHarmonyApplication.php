@@ -2,13 +2,16 @@
 
 namespace PhilHarmony;
 
-use PhilHarmony\Http\Request;
-use PhilHarmony\Http\Response;
+use PhilHarmony\Http\Request\Request;
+use PhilHarmony\Http\Response\Response;
 use PhilHarmony\Http\Uri;
 use PhilHarmony\Http\Url;
 use PhilHarmony\Routing\Route;
 use PhilHarmony\Routing\Router;
 use PhilHarmony\DependencyInjection\Container;
+use PhilHarmony\Routing\RouterCollection;
+use PhilHarmony\Views\PhpFileRender;
+use PhilHarmony\Views\View;
 use ReflectionObject;
 
 class PhilHarmonyApplication
@@ -16,68 +19,42 @@ class PhilHarmonyApplication
     /**
      * @var string
      */
-    private $projectDir;
-
-    /**
-     * @var Route
-     */
-    private $route;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Response
-     */
-    private $response;
+    public static $ROOT_DIR;
 
     /**
      * @var Container
      */
-    private static $container;
+    public static $container;
 
     public function __construct()
     {
-        $this->initContainer();
-    }
-
-    public function initContainer(): void
-    {
-        self::$container = new Container();
-        self::$container->set(
-            Uri::class,
-            ['url' => Url::createUrl()]
-        );
-        self::$container->set(
-            Request::class,
-            [
-                'method' => $_SERVER['REQUEST_METHOD'],
-                'uri' => self::$container->get(Uri::class)
-            ]
-        );
-        self::$container->set(Response::class);
-        self::$container->set(
-            Route::class,
-            [
-                'request' => self::$container->get(Request::class),
-                'response' => self::$container->get(Response::class)
-            ]
-        );
+       $this->initRootProjectDirectory();
+       PhilHarmonyBootstrap::bootstrap();
     }
 
     public function run(): void
     {
         $route = self::$container->get(Route::class);
-        $route->get('/h', function () {
+        $route->get('/', function () {
             return 'Home page';
         });
         $route->get('/a', ['class' => Router::class]);
-        $route->get('/t', 'Test page');
-        $route->get('/aa', [Response::class]);
+        $route->get('/route', 'Test page');
+        $route->get('/about', [__CLASS__]);
+        $route->get('/dir', function () {
+            return self::$ROOT_DIR;
+        });
+        $route->get('/view', ['class' => self::$container->get(View::class)]);
+//        $route->get('/view', function () {
+////            $view = self::$container->get(View::class);
+////            return $view->render();
+//            $render = new PhpFileRender();
+//            return $render->render();
+//        });
 
         echo $route->resolve();
+//        $containerBuilder = new ContainerBuilder();
+//        $containerBuilder->register();
 //        foreach ($_SERVER as $key => $value) {
 //            echo '[' . $key . ']' . ' => ' . $value . '<br>';
 //        }
@@ -108,9 +85,9 @@ class PhilHarmonyApplication
 //        }
     }
 
-    public function getProjectDir(): string
+    private function initRootProjectDirectory(): void
     {
-        if (!$this->projectDir) {
+        if (!self::$ROOT_DIR) {
             $r = new ReflectionObject($this);
 
             if (!is_file($dir = $r->getFileName())) {
@@ -121,9 +98,7 @@ class PhilHarmonyApplication
             while (!is_file($dir.'/composer.json')) {
                 $dir = dirname($dir);
             }
-            $this->projectDir = $dir;
+            self::$ROOT_DIR = $dir;
         }
-
-        return $this->projectDir;
     }
 }

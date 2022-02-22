@@ -2,8 +2,8 @@
 
 namespace PhilHarmony\Routing;
 
-use PhilHarmony\Http\Request;
-use PhilHarmony\Http\Response;
+use PhilHarmony\Http\Request\Request;
+use PhilHarmony\Http\Response\Response;
 
 class Route extends BaseRoute
 {
@@ -23,11 +23,11 @@ class Route extends BaseRoute
     private $response;
 
 
-    public function __construct(Request $request, Response $response)
+    public function __construct(Request $request, Response $response, RouterCollection $routerCollection)
     {
         $this->request = $request;
         $this->response = $response;
-        $this->routeCollection = new RouterCollection();
+        $this->routeCollection = $routerCollection;
     }
 
     /**
@@ -53,7 +53,9 @@ class Route extends BaseRoute
         }
 
         if (is_string($callback)) {
-            return $callback;
+            //return PhilHarmonyApplication::getView()->render($callback);
+            echo $callback;
+            return null;
         }
 
         if (is_array($callback)) {
@@ -68,6 +70,5 @@ class Route extends BaseRoute
         }
 
         return call_user_func($callback, $this->request, $this->response);
-
     }
 }

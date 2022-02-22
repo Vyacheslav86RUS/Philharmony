@@ -1,6 +1,6 @@
 <?php
 
-namespace PhilHarmony\Http;
+namespace PhilHarmony\Http\Request;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
@@ -68,7 +68,9 @@ class Request implements ServerRequestInterface
      */
     public function withProtocolVersion($version)
     {
-        // TODO: Implement withProtocolVersion() method.
+        $this->_version = $version;
+
+        return $this;
     }
 
     /**

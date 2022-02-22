@@ -2,9 +2,9 @@
 
 namespace PhilHarmony\Views;
 
-abstract class ViewRender extends ViewsInterface
+abstract class ViewRender implements ViewRenderInterface
 {
-    public function render(View $view, string $file, $params = []): string
+    public function render(View $view, string $file, array $params = []): string
     {
         return '';
     }
