@@ -21,7 +21,6 @@ phpunit.phar
 
 #public for test
 /public
-
 /views
 /controllers
 /models
