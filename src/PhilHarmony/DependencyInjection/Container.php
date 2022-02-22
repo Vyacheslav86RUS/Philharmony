@@ -2,40 +2,34 @@
 
 namespace PhilHarmony\DependencyInjection;
 
+use PhilHarmony\DependencyInjection\Arguments\Definition;
+use PhilHarmony\DependencyInjection\Arguments\Instance;
+use PhilHarmony\DependencyInjection\Arguments\Parameter;
+use PhilHarmony\DependencyInjection\Arguments\Singleton;
+use PhilHarmony\DependencyInjection\Exception\PhilHarmonyContainerException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 class Container implements ContainerInterface
 {
+    private $container = [];
+    private $definition = [];
+    private $instances = [];
+    private $parameters = [];
     /**
-     * @var array[]
+     * @var Singleton
      */
-    private $container;
+    private $singletons;
 
-    /**
-     * @var array[]
-     */
-    private $definition;
-
-    /**
-     * @var object[]
-     */
-    private $instances;
-
-    /**
-     * @var array[]
-     */
-    private $parameters;
-
-    /**
-     * @param string $id
-     * @return object
-     */
-    public function get($id)
+    public function get(string $id): object
     {
+        if ($this->hasSingleton($id)) {
+            return $this->singletons->getSingletons($id);
+        }
+
         if (!$this->has($id)) {
-            throw new \Exception();
+            throw new PhilHarmonyContainerException('not found ' . $id);
         }
 
         if (!isset($this->instances[$id])) {
@@ -50,22 +44,56 @@ class Container implements ContainerInterface
         return isset($this->container[$id]);
     }
 
-    public function set(string $class, array $parameters = []): void
+    /**
+     * @param string $id
+     * @return bool
+     */
+    public function hasSingleton(string $id): bool
+    {
+        return $this->singletons->has($id);
+    }
+
+    /**
+     * @param string $class
+     * @param string|null $definition
+     * @param array $parameters
+     * @return $this
+     */
+    public function set(string $class, ?string $definition = null, array $parameters = [])
+    {
+        $this->setDefinitions($class, $definition, $parameters);
+        if ($this->hasSingleton($class)) {
+            unset($this->singletons[$class]);
+        }
+
+        return $this;
+    }
+
+    public function setSingleton(string $class, ?string $definition = null, array $parameters = [])
+    {
+        $this->setDefinitions($class, $definition, $parameters);
+        $this->singletons->setSingletons($class, $this->build($class));
+
+        return $this;
+    }
+
+    private function setDefinitions(string $class, ?string $definition = null, array $parameters = [])
     {
         if (!class_exists($class)) {
-            throw new \Exception('Not found ' . $class);
+            throw new PhilHarmonyContainerException('Not found ' . $class);
         }
 
         $this->container[$class] = $class;
+        $this->definition[$class] = $definition;
         $this->parameters[$class] = $parameters;
     }
 
-    private function build(string $class)
+    private function build(string $class): object
     {
         $reflection = new \ReflectionClass($this->container[$class]);
 
         if (!$reflection->isInstantiable()) {
-            throw new \Exception('Class ' . $this->container[$class] . 'is not instantiable');
+            throw new PhilHarmonyContainerException('Class ' . $this->container[$class] . 'is not instantiable');
         }
 
         $constructor = $reflection->getConstructor();
@@ -90,11 +118,14 @@ class Container implements ContainerInterface
     {
         $dependencies = [];
         /** @var \ReflectionParameter $parameter */
-        foreach ($parameters as $parameter) {
+        foreach ($parameters as $index => $parameter) {
             $dependency = $parameter->getClass();
             if ($dependency === null) {
-                if (isset($this->parameters[$class][$parameter->name])) {
-                    $dependencies[] = $this->parameters[$class][$parameter->name];
+                $classArg = $this->parameters[$class];
+                if (isset($classArg[$parameter->name])) {
+                    $dependencies[] = $classArg[$parameter->name];
+                } elseif (array_key_exists($index, $classArg)){
+                    $dependencies[] = $classArg[$index];
                 } elseif ($parameter->isDefaultValueAvailable()) {
                     $dependencies[] = $parameter->getDefaultValue();
                 }
